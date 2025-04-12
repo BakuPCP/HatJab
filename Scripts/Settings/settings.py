@@ -1,9 +1,10 @@
-from tkinter import ttk, messagebox
 import tkinter as tk
+from tkinter import ttk, messagebox
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.patches import Rectangle
+from .Instruments.move import NodeMover
 
 
 class FileNodeEditor:
@@ -11,25 +12,51 @@ class FileNodeEditor:
         self.master = master
         master.title("File Node Editor")
 
-        # Инициализация графа
+        # 1. Сначала инициализируем все фреймы
+        self._init_frames()
+
+        # 2. Затем инициализируем граф
         self.graph = nx.DiGraph()
         self.pos = {}
         self.selected_node = None
         self.dragged_node = None
+        self._init_graph()
 
-        # Настройки отображения
+        # 3. Настройки отображения
         self.node_width = 0.2
         self.node_height = 0.1
         self.font_size = 10
         self.node_color = "#1f78b4"
         self.selected_color = "#e31a1c"
 
-        # Создаем базовую структуру
-        self._init_graph()
-
-        # Интерфейс
-        self._setup_ui()
+        # 4. Инициализация кнопок и других элементов
+        self._init_buttons()
         self._draw_graph()
+        # Инициализация инструментов
+        self.mover = NodeMover(self)
+        self.mover.bind_events()
+
+    def _init_frames(self):
+        """Инициализация всех фреймов интерфейса"""
+        self.main_frame = ttk.Frame(self.master)
+        self.main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Панель инструментов (теперь создается в первую очередь)
+        self.toolbar_frame = ttk.Frame(self.main_frame)
+        self.toolbar_frame.pack(fill=tk.X, pady=5)
+
+        # Графическая область
+        self.figure = plt.figure(figsize=(10, 8))
+        self.canvas_frame = ttk.Frame(self.main_frame)
+        self.canvas_frame.pack(fill=tk.BOTH, expand=True)
+        self.canvas = FigureCanvasTkAgg(self.figure, self.canvas_frame)
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def _init_buttons(self):
+        """Инициализация кнопок"""
+        from .Buttons.save_settings import SaveSettingsButton
+        self.save_button = SaveSettingsButton(self.toolbar_frame, self)
+        self.save_button.create_button()
 
     def _init_graph(self):
         """Инициализация базовой структуры"""
@@ -63,10 +90,22 @@ class FileNodeEditor:
         self.pos = nx.spring_layout(self.graph, k=0.5, seed=42)
 
     def _setup_ui(self):
+
+
+
+
         """Настройка интерфейса"""
         # Основной фрейм
         self.main_frame = ttk.Frame(self.master)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Панель кнопок сверху
+        self.button_frame = ttk.Frame(self.main_frame)
+        self.button_frame.pack(fill=tk.X, pady=5)
+
+        # Добавляем кнопку сохранения
+        self.save_button = SaveSettingsButton(self.toolbar_frame, self)
+        self.save_button.create_button()
 
         # Графическая область
         self.figure = plt.figure(figsize=(10, 8))
@@ -75,7 +114,7 @@ class FileNodeEditor:
 
         # Панель управления
         self.control_frame = ttk.Frame(self.main_frame)
-        self.control_frame.pack(fill=tk.X)
+        self.control_frame.pack(fill=tk.X, pady=5)
 
         ttk.Button(self.control_frame, text="Refresh", command=self._draw_graph).pack(side=tk.LEFT)
         ttk.Button(self.control_frame, text="Reset Layout", command=self._reset_layout).pack(side=tk.LEFT)
@@ -152,11 +191,9 @@ class FileNodeEditor:
 
 
 def start_editor():
-    """Запуск редактора"""
     root = tk.Tk()
     editor = FileNodeEditor(root)
     root.mainloop()
-
 
 if __name__ == "__main__":
     start_editor()
