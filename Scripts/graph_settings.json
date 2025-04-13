@@ -1,0 +1,144 @@
+{
+  "nodes": [
+    [
+      "System",
+      {
+        "type": "folder"
+      }
+    ],
+    [
+      "mods",
+      {
+        "type": "folder"
+      }
+    ],
+    [
+      "Scripts",
+      {
+        "type": "folder"
+      }
+    ],
+    [
+      "Data",
+      {
+        "type": "folder"
+      }
+    ],
+    [
+      "main",
+      {
+        "type": "folder"
+      }
+    ],
+    [
+      "System/crypto.py",
+      {
+        "type": "file",
+        "color": "#e31a1c"
+      }
+    ],
+    [
+      "System/hjcheck.py",
+      {
+        "type": "file"
+      }
+    ],
+    [
+      "mods/example.mod",
+      {
+        "type": "file"
+      }
+    ],
+    [
+      "mods/weather.mod",
+      {
+        "type": "file"
+      }
+    ],
+    [
+      "Scripts/commands.txt",
+      {
+        "type": "file"
+      }
+    ],
+    [
+      "Scripts/settings.cfg",
+      {
+        "type": "file"
+      }
+    ],
+    [
+      "Data/keys.dat",
+      {
+        "type": "file"
+      }
+    ],
+    [
+      "Data/session.ses",
+      {
+        "type": "file"
+      }
+    ],
+    [
+      "main/main.py",
+      {
+        "type": "file"
+      }
+    ]
+  ],
+  "edges": [
+    [
+      "System",
+      "System/crypto.py"
+    ],
+    [
+      "System",
+      "System/hjcheck.py"
+    ],
+    [
+      "mods",
+      "mods/example.mod"
+    ],
+    [
+      "mods",
+      "mods/weather.mod"
+    ],
+    [
+      "Scripts",
+      "Scripts/commands.txt"
+    ],
+    [
+      "Scripts",
+      "Scripts/settings.cfg"
+    ],
+    [
+      "Scripts",
+      "Data"
+    ],
+    [
+      "Data",
+      "Data/keys.dat"
+    ],
+    [
+      "Data",
+      "Data/session.ses"
+    ],
+    [
+      "main",
+      "main/main.py"
+    ],
+    [
+      "main",
+      "System"
+    ],
+    [
+      "main",
+      "mods"
+    ],
+    [
+      "main",
+      "Scripts"
+    ]
+  ],
+  "positions": {}
+}
