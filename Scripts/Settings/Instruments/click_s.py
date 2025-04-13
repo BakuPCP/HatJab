@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import Menu
-
+from .utils import algo_s
 
 class RightClickMenu:
     def __init__(self, editor):
         self.editor = editor
         self.selected_node = None
+        self.algo_viewer = algo_s.AlgorithmViewer(editor)
+
         self.bind_events()
 
     def bind_events(self):
@@ -20,9 +22,11 @@ class RightClickMenu:
         # Проверяем клик по узлу
         self.selected_node = None
         for node, (x, y) in self.editor.graph_manager.pos.items():
-            node_type = self.editor.graph_manager.graph.nodes[node].get('type', 'file')
-            width = self.editor.node_width * (0.7 if node_type == "file" else 1.0)
-            height = self.editor.node_height * (0.7 if node_type == "file" else 1.0)
+            #node_type = self.editor.graph_manager.graph.nodes[node].get('type', 'file')
+            #width = self.editor.node_width * (0.7 if node_type == "file" else 1.0)
+            #height = self.editor.node_height * (0.7 if node_type == "file" else 1.0)
+            from .utils.nt_help import NodeTypeHelper
+            width, height = NodeTypeHelper.calculate_dimensions(self.editor, self.editor.graph_manager.graph, node)
 
             if (x - width / 2 <= event.xdata <= x + width / 2 and
                     y - height / 2 <= event.ydata <= y + height / 2):
@@ -32,7 +36,7 @@ class RightClickMenu:
         # Создаем контекстное меню только если клик был по узлу
         if self.selected_node and hasattr(event, 'guiEvent'):
             menu = Menu(self.editor.master, tearoff=0)
-            menu.add_command(label="Свойства", command=self.show_properties)
+            menu.add_command(label="Свойства", command=lambda: self.algo_viewer.show(self.selected_node))
             menu.post(event.guiEvent.x_root, event.guiEvent.y_root)
 
     def show_properties(self):

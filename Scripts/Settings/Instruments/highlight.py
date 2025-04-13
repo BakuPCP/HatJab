@@ -29,8 +29,10 @@ class MultiHighlighter:
 
         for node, (x, y) in self.editor.graph_manager.pos.items():
             node_type = self.editor.graph_manager.graph.nodes[node].get('type', 'file')
-            width = self.editor.node_width * (0.7 if node_type == "file" else 1.0)
-            height = self.editor.node_height * (0.7 if node_type == "file" else 1.0)
+            #width = self.editor.node_width * (0.7 if node_type == "file" else 1.0)
+            #height = self.editor.node_height * (0.7 if node_type == "file" else 1.0)
+            from .utils.nt_help import NodeTypeHelper
+            width, height = NodeTypeHelper.calculate_dimensions(self.editor, self.editor.graph_manager.graph, node)
 
             if (abs(x - event.xdata) < width / 2 and abs(y - event.ydata) < height / 2):
                 clicked_node = node

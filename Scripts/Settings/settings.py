@@ -50,6 +50,11 @@ class FileNodeEditor:
         from .Instruments.click_s import RightClickMenu
         self.right_click = RightClickMenu(self)
 
+        # Добавляем отладчик (новый код)
+        from .Instruments.utils.debug_m import DebugHelper
+        self.debug_helper = DebugHelper(self)
+
+
     def _init_frames(self):
         """Инициализация всех фреймов интерфейса"""
         self.main_frame = ttk.Frame(self.master)
