@@ -42,6 +42,10 @@ class FileNodeEditor:
         self.mover = NodeMover(self)
         self.highlighter = MultiHighlighter(self)
 
+        # Добавляем эту строку после инициализации других инструментов
+        from .Instruments.utils.help_move import GroupMover
+        self.group_mover = GroupMover(self)
+
     def _init_frames(self):
         """Инициализация всех фреймов интерфейса"""
         self.main_frame = ttk.Frame(self.master)
