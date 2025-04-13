@@ -46,6 +46,10 @@ class FileNodeEditor:
         from .Instruments.utils.help_move import GroupMover
         self.group_mover = GroupMover(self)
 
+        # Вот сюда вставляем новый инструмент (добавляем в самом конце __init__)
+        from .Instruments.click_s import RightClickMenu
+        self.right_click = RightClickMenu(self)
+
     def _init_frames(self):
         """Инициализация всех фреймов интерфейса"""
         self.main_frame = ttk.Frame(self.master)
