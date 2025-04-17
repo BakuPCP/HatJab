@@ -90,7 +90,7 @@ def run_ai_editor():
     try:
         # Добавляем путь к модулям
         sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from Scripts.Settings.settings import start_editor
+        from Scripts.settings import start_editor
         start_editor()
     except ImportError as e:
         print(f"[Ошибка] Не удалось импортировать редактор: {e}")
@@ -139,7 +139,7 @@ def main():
 
                 try:
 
-                    from Scripts.Settings.settings import start_editor
+                    from Scripts.settings import start_editor
 
                     start_editor()
 
