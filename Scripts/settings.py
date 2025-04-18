@@ -24,8 +24,12 @@ class SettingsEditor:
 
     def _setup_ui(self):
         """Настройка пользовательского интерфейса"""
+        # Создаем основной фрейм
         self.main_frame = ttk.Frame(self.master, padding="10")
         self.main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Применяем текущую тему
+        self.apply_theme(self.settings.get("theme", "dark"))
 
         # Вкладки
         self.notebook = ttk.Notebook(self.main_frame)
@@ -65,13 +69,15 @@ class SettingsEditor:
         # Тема
         ttk.Label(frame, text="Тема оформления:").grid(row=0, column=0, sticky=tk.W, pady=2)
         self.theme_var = tk.StringVar(value=self.settings.get("theme", "dark"))
-        ttk.Combobox(
+        theme_combobox = ttk.Combobox(
             frame,
             textvariable=self.theme_var,
-            values=["light", "dark", "system"],
+            values=["light", "dark"],
             state="readonly",
             width=15
-        ).grid(row=0, column=1, sticky=tk.W, pady=2)
+        )
+        theme_combobox.grid(row=0, column=1, sticky=tk.W, pady=2)
+        self.theme_var.trace_add('write', lambda *args: self.apply_theme(self.theme_var.get()))
 
         # Язык
         ttk.Label(frame, text="Язык интерфейса:").grid(row=1, column=0, sticky=tk.W, pady=2)
@@ -119,6 +125,46 @@ class SettingsEditor:
         # Подсказка
         ttk.Label(frame, text="Формат: команда|описание").pack(anchor=tk.W)
 
+    def apply_theme(self, theme):
+        """Применение цветовой темы ко всему интерфейсу"""
+        if theme == "light":
+            main_bg = "#E0E0E0"  # Пепельный (основной фон)
+            frame_bg = "#C0C0C0"  # Чуть темнее для рамок
+            fg_color = "#000000"  # Черный текст
+            entry_bg = "#FFFFFF"  # Белый для полей ввода
+        else:
+            main_bg = "#424242"  # Темно-серый (основной фон)
+            frame_bg = "#616161"  # Чуть светлее для рамок
+            fg_color = "#FFFFFF"  # Белый текст
+            entry_bg = "#303030"  # Темный для полей ввода
+
+        # Настраиваем основной фон окна
+        self.master.configure(bg=main_bg)
+
+        # Создаем и настраиваем стили для ttk виджетов
+        style = ttk.Style()
+        style.theme_use('default')
+
+        # Основные стили
+        style.configure('.', background=main_bg, foreground=fg_color)
+        style.configure('TFrame', background=main_bg)
+        style.configure('TLabel', background=main_bg, foreground=fg_color)
+        style.configure('TButton', background=main_bg, foreground=fg_color)
+        style.configure('TCombobox', fieldbackground=entry_bg, foreground=fg_color)
+        style.configure('TCheckbutton', background=main_bg, foreground=fg_color)
+        style.configure('TLabelframe', background=frame_bg, foreground=fg_color)
+        style.configure('TLabelframe.Label', background=frame_bg, foreground=fg_color)
+
+        # Обновляем текстовые поля
+        if hasattr(self, 'commands_text'):
+            self.commands_text.configure(
+                bg=entry_bg,
+                fg=fg_color,
+                insertbackground=fg_color,
+                selectbackground=fg_color,
+                selectforeground=entry_bg
+            )
+
     def _load_settings(self):
         """Загрузка настроек из файла"""
         if self.settings_file.exists():
@@ -127,8 +173,8 @@ class SettingsEditor:
                     return json.load(f)
             except Exception as e:
                 messagebox.showerror("Ошибка", f"Не удалось загрузить настройки: {str(e)}")
-                return {}
-        return {}
+                return {"theme": "dark", "language": "ru", "autosave": True, "font_size": 12}
+        return {"theme": "dark", "language": "ru", "autosave": True, "font_size": 12}
 
     def _load_commands(self):
         """Загрузка команд из файла"""
