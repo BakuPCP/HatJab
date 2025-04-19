@@ -1,0 +1,99 @@
+import os
+import sys
+from System import crypto
+from .commands import load_commands
+
+
+def handle_command(cmd, commands, catal=None):
+    """Обработка команд"""
+    if not cmd:
+        return True
+
+    if cmd == "help":
+        print("\nCommands:")
+        max_len = max(len(c[0]) for c in commands)
+        for c, d in commands:
+            print(f"  {c.ljust(max_len)} - {d}")
+
+    elif cmd == "mods":
+        from System import hjcheck
+        hjcheck.list_mods()
+
+    elif cmd == "catt" and catal:
+        files = catal.get_mod_list()
+        print("\nFile in catalyst:" if files else "\nFolder catalyst is empty")
+        for f in sorted(files):
+            print(f"- {f}")
+
+    elif cmd == "settings":
+        print("\nChoose settings editor:")
+        print("1. Console")
+        print("2. GUI")
+        choice = input("Select (1-2): ").strip()
+
+        if choice == "1":
+            try:
+                from Scripts.console_settings import ConsoleSettingsEditor
+                editor = ConsoleSettingsEditor()
+                editor.run()
+            except Exception as e:
+                print(f"[Error] Failed to start console: {e}")
+        elif choice == "2":
+            try:
+                from Scripts.settings import start_editor
+                start_editor()
+            except Exception as e:
+                print(f"[Error] Failed to start GUI: {e}")
+        else:
+            print("Invalid choice, returning to main menu")
+
+
+    elif cmd == "exit":
+
+        if catal and catal.process_mods():
+            print("\n[System] New mods installed")
+
+        if input("\nSave session before exit? (y/n): ").lower() == 'y':
+            crypto.save_session()
+
+            print("Session saved")
+            return False
+
+
+
+    elif cmd == "clear":
+        os.system("cls" if os.name == "nt" else "clear")
+
+    elif cmd == "backup":
+        crypto.create_backup()
+
+    elif cmd == "version":
+        print("\nHatJab v1.0.5")
+        print("Mod & Encryption management System")
+
+    else:
+        print(f"\nUnknown command: {cmd}")
+        print("Type 'help' to view commands")
+
+    return True
+
+
+def main_loop(catal=None):
+    """Основной цикл программы"""
+    commands = load_commands()
+
+    while True:
+        try:
+            cmd = input("> ").strip().lower()
+            if not handle_command(cmd, commands, catal):
+                break
+
+        except KeyboardInterrupt:
+            print("\nПрерывание (Ctrl+C)")
+            if input("Terminate program? (y/n): ").lower() == 'y':
+                if os.path.exists("System/catal.py"):
+                    crypto.encrypt_file("System/catal.py", "System/catal.modhj")
+                break
+
+        except Exception as e:
+            print(f"\n[Error] {e}")

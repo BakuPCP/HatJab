@@ -1,7 +1,6 @@
 import os
 import json
 import shutil
-from System import crypto
 
 CATALYST_DIR = "catalyst"
 
@@ -19,17 +18,17 @@ def _create_example_mod():
         "name": "example_mod",
         "version": "1.0",
         "commands": {
-            "test": "Mode example"
+            "test": "Пример команды мода"
         }
     }
 
     # Файл данных мода
-    with open(os.path.join(CATALYST_DIR, "example_mod_d.lhj"), "w") as f:
-        json.dump(example_mod, f, indent=4)
+    with open(os.path.join(CATALYST_DIR, "example_mod_d.lhj"), "w", encoding='utf-8') as f:
+        json.dump(example_mod, f, indent=4, ensure_ascii=False)
 
     # Код мода
-    with open(os.path.join(CATALYST_DIR, "example_mod.py"), "w") as f:
-        f.write("""def cmd_test():\n    print("Test mode command!")\n""")
+    with open(os.path.join(CATALYST_DIR, "example_mod.py"), "w", encoding='utf-8') as f:
+        f.write("""def cmd_test():\n    print("Это тестовая команда из мода!")\n""")
 
 
 def get_mod_list():
@@ -45,7 +44,7 @@ def get_mod_list():
 
 
 def process_mods():
-    """Шифрует и перемещает моды в папку mods"""
+    """Перемещает моды в папку mods без шифрования"""
     if not os.path.exists(CATALYST_DIR):
         return False
 
@@ -57,18 +56,22 @@ def process_mods():
             data_path = os.path.join(CATALYST_DIR, data_file)
 
             if os.path.exists(data_path):
-                # Шифруем код мода
-                with open(os.path.join(CATALYST_DIR, file), "r") as f:
-                    mod_code = f.read()
-                crypto.encrypt_data(mod_code, f"mods/{mod_name}.modhj")
+                # Копируем файлы мода
+                shutil.copy2(
+                    os.path.join(CATALYST_DIR, file),
+                    os.path.join("mods", file)
+                )
 
                 # Перемещаем файл данных
-                shutil.move(data_path, f"mods/{data_file}")
+                shutil.move(
+                    data_path,
+                    os.path.join("mods", data_file)
+                )
 
-                # Удаляем исходный файл
+                # Удаляем исходные файлы
                 os.remove(os.path.join(CATALYST_DIR, file))
                 processed = True
-                print(f"[Catalyst] Mode {mod_name} installed")
+                print(f"[Catalyst] Мод {mod_name} установлен")
 
     return processed
 

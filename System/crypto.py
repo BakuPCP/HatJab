@@ -12,7 +12,6 @@ from datetime import datetime
 RSA_PRIVATE_KEY = None
 RSA_PUBLIC_KEY = None
 
-
 def generate_rsa_keys():
     """Генерация и сохранение RSA ключей"""
     global RSA_PRIVATE_KEY, RSA_PUBLIC_KEY
@@ -39,7 +38,6 @@ def generate_rsa_keys():
     except Exception as e:
         print(f"[CRITICAL] Key generation error: {e}")
         raise
-
 
 def encrypt_data(data, output_file):
     """Шифрование данных с использованием RSA+AES"""
@@ -81,7 +79,6 @@ def encrypt_data(data, output_file):
         print(f"[Error] Encryption failed: {e}")
         return False
 
-
 def decrypt_data(input_file, output_file=None):
     """Дешифрование данных"""
     if RSA_PRIVATE_KEY is None:
@@ -119,35 +116,6 @@ def decrypt_data(input_file, output_file=None):
         print(f"[Error] Decryption failed: {e}")
         return None
 
-
-def encrypt_file(src, dst):
-    """Шифрование файла"""
-    try:
-        with open(src, "rb") as f:
-            data = f.read()
-        if encrypt_data(data, dst):
-            os.remove(src)
-            return True
-        return False
-    except Exception as e:
-        print(f"[Error] Encryption files failed: {e}")
-        return False
-
-
-def decrypt_to_file(src, dst):
-    """Дешифрование в файл"""
-    data = decrypt_data(src)
-    if data:
-        try:
-            with open(dst, "wb") as f:
-                f.write(data)
-            os.chmod(dst, 0o600)
-            return True
-        except Exception as e:
-            print(f"[Error] Decryption files failed: {e}")
-    return False
-
-
 def save_session():
     """Сохранение сессии"""
     session = {
@@ -157,7 +125,6 @@ def save_session():
     }
     if not encrypt_data(json.dumps(session), "Data/session.seshj"):
         print("[Error] Failed to save session")
-
 
 def create_backup():
     """Создание резервной копии"""
@@ -195,7 +162,6 @@ def create_backup():
     except Exception as e:
         print(f"\n[Error] Backup creation failed: {e}")
         return False
-
 
 # Инициализация ключей при запуске
 generate_rsa_keys()
