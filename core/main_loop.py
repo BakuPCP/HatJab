@@ -19,6 +19,27 @@ def handle_command(cmd, commands, catal=None):
         from System import hjcheck
         hjcheck.list_mods()
 
+    elif cmd.startswith("settings text color"):
+        # Обработка изменения цвета текста
+        color = cmd.split()[-1].lower()
+        colors = {
+            'green': '\033[92m',
+            'lightblue': '\033[94m',
+            'purple': '\033[95m',
+            'default': '\033[0m'
+        }
+
+        if color in colors:
+            # Сохраняем настройки цвета
+            try:
+                with open("Scripts/color.cfg", "w") as f:
+                    f.write(color)
+                print(f"{colors[color]}Text color changed to {color}{colors['default']}")
+            except Exception as e:
+                print(f"[Error] Failed to save color settings: {e}")
+        else:
+            print("Available colors: green, lightblue, purple, default")
+
     elif cmd == "catt" and catal:
         files = catal.get_mod_list()
         print("\nFile in catalyst:" if files else "\nFolder catalyst is empty")

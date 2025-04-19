@@ -8,6 +8,7 @@ def load_commands():
         "mods": "Show mods list",
         "clear": "Clear console",
         "settings": "System settings",
+        "settings text color [color]": "Change text color",
         "exit": "Exit",
         "backup": "Create backup",
         "catt": "Show mods in catalyst",
