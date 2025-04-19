@@ -135,17 +135,46 @@ def main():
                     print(f"- {f}")
 
 
+
             elif cmd == "settings":
 
-                try:
+                print("\nChoose settings editor:")
 
-                    from Scripts.settings import start_editor
+                print("1. Console")
 
-                    start_editor()
+                print("2. GUI")
 
-                except Exception as e:
+                choice = input("Select (1-2): ").strip()
 
-                    print(f"[Error] Failed to start editor: {e}")
+                if choice == "1":
+
+                    try:
+
+                        from Scripts.console_settings import ConsoleSettingsEditor
+
+                        editor = ConsoleSettingsEditor()
+
+                        editor.run()
+
+                    except Exception as e:
+
+                        print(f"[Error] Failed to start console: {e}")
+
+                elif choice == "2":
+
+                    try:
+
+                        from Scripts.settings import start_editor
+
+                        start_editor()
+
+                    except Exception as e:
+
+                        print(f"[Error] Failed to start GUI: {e}")
+
+                else:
+
+                    print("Invalid choice, returning to main menu")
 
             elif cmd == "exit":
                 if catal and catal.process_mods():
