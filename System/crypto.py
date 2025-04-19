@@ -37,7 +37,7 @@ def generate_rsa_keys():
                 ))
             os.chmod(key_file, 0o600)
     except Exception as e:
-        print(f"[Критично] Ошибка генерации ключей: {e}")
+        print(f"[CRITICAL] Key generation error: {e}")
         raise
 
 
@@ -78,7 +78,7 @@ def encrypt_data(data, output_file):
         os.chmod(output_file, 0o600)
         return True
     except Exception as e:
-        print(f"[Ошибка] Шифрование не удалось: {e}")
+        print(f"[Error] Encryption failed: {e}")
         return False
 
 
@@ -116,7 +116,7 @@ def decrypt_data(input_file, output_file=None):
             return True
         return data
     except Exception as e:
-        print(f"[Ошибка] Дешифрование не удалось: {e}")
+        print(f"[Error] Decryption failed: {e}")
         return None
 
 
@@ -130,7 +130,7 @@ def encrypt_file(src, dst):
             return True
         return False
     except Exception as e:
-        print(f"[Ошибка] Не удалось зашифровать файл: {e}")
+        print(f"[Error] Encryption files failed: {e}")
         return False
 
 
@@ -144,7 +144,7 @@ def decrypt_to_file(src, dst):
             os.chmod(dst, 0o600)
             return True
         except Exception as e:
-            print(f"[Ошибка] Не удалось сохранить расшифрованные данные: {e}")
+            print(f"[Error] Decryption files failed: {e}")
     return False
 
 
@@ -156,7 +156,7 @@ def save_session():
         "history": []
     }
     if not encrypt_data(json.dumps(session), "Data/session.seshj"):
-        print("[Ошибка] Не удалось сохранить сессию")
+        print("[Error] Failed to save session")
 
 
 def create_backup():
@@ -190,10 +190,10 @@ def create_backup():
         shutil.make_archive(os.path.join(backup_dir, backup_name), "zip", temp_dir)
         shutil.rmtree(temp_dir)
 
-        print(f"\n[Успех] Резервная копия {backup_name}.zip создана")
+        print(f"\n[Success] Backup {backup_name}.zip created")
         return True
     except Exception as e:
-        print(f"\n[Ошибка] Не удалось создать резервную копию: {e}")
+        print(f"\n[Error] Backup creation failed: {e}")
         return False
 
 

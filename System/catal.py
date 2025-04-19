@@ -19,7 +19,7 @@ def _create_example_mod():
         "name": "example_mod",
         "version": "1.0",
         "commands": {
-            "test": "Пример команды мода"
+            "test": "Mode example"
         }
     }
 
@@ -29,7 +29,7 @@ def _create_example_mod():
 
     # Код мода
     with open(os.path.join(CATALYST_DIR, "example_mod.py"), "w") as f:
-        f.write("""def cmd_test():\n    print("Это тестовая команда из мода!")\n""")
+        f.write("""def cmd_test():\n    print("Test mode command!")\n""")
 
 
 def get_mod_list():
@@ -68,7 +68,7 @@ def process_mods():
                 # Удаляем исходный файл
                 os.remove(os.path.join(CATALYST_DIR, file))
                 processed = True
-                print(f"[Catalyst] Мод {mod_name} установлен")
+                print(f"[Catalyst] Mode {mod_name} installed")
 
     return processed
 

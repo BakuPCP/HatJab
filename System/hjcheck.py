@@ -21,7 +21,7 @@ def check_password():
         remaining = int(lock_time - time.time())
         if remaining > 0:
             print(
-                f"\n[Блокировка] Система временно заблокирована. Попробуйте через {remaining // 60} мин {remaining % 60} сек.")
+                f"\n[BLOCK] The system is temporarily locked. Please try again in {remaining // 60} min {remaining % 60} sec.")
             return False
         else:
             os.remove(LOCK_FILE)
@@ -34,14 +34,14 @@ def check_password():
 
 def create_password():
     """Создание нового пароля"""
-    print("\n[Система] Создание нового пароля")
+    print("\n[System] Creating a new password")
     while True:
-        password = input("Введите новый пароль: ")
-        confirm = input("Подтвердите пароль: ")
+        password = input("Enter new password: ")
+        confirm = input("Confirm password: ")
 
         if password == confirm:
             if len(password) < 8:
-                print("[Ошибка] Пароль должен содержать минимум 8 символов")
+                print("[Error] Password must be at least 8 characters")
                 continue
 
             # Хеширование пароля перед шифрованием
@@ -51,10 +51,10 @@ def create_password():
             crypto.encrypt_data(hashed, "Data/ps.dhj")
             crypto.encrypt_data(hashed, "Data/rep.dhj")
 
-            print("[Успех] Пароль успешно создан!")
+            print("[Success] Password created successfully!")
             return True
         else:
-            print("[Ошибка] Пароли не совпадают. Попробуйте снова.")
+            print("[Error] Miss. Try again.")
 
 
 def check_file_encoding(filepath):
@@ -75,30 +75,30 @@ def verify_password():
     attempts = MAX_ATTEMPTS
 
     while attempts > 0:
-        password = input("\nВведите пароль: ")
+        password = input("\nEnter password: ")
 
         # Дешифровка хранимого пароля
         decrypted_data = crypto.decrypt_data("Data/ps.dhj")
 
         if decrypted_data is None:
-            print("[Ошибка] Не удалось дешифровать пароль. Попробуйте снова.")
+            print("[Error] Decryption password failed. Try again.")
             attempts -= 1
             continue
 
         # Проверка пароля
         try:
             if bcrypt.checkpw(password.encode(), decrypted_data):
-                print("[Успех] Авторизация прошла успешно!")
+                print("[Success] Success!")
                 return True
             else:
                 attempts -= 1
                 if attempts > 0:
-                    print(f"[Ошибка] Неверный пароль. Осталось попыток: {attempts}")
+                    print(f"[Error] Wrong password. Attempts: {attempts}")
                 else:
                     activate_cooldown()
-                    print("\n[Блокировка] Превышено количество попыток. Система заблокирована на 5 минут.")
+                    print("\n[BLOCK] Too much. System locked.")
         except Exception as e:
-            print(f"[Ошибка] Ошибка проверки пароля: {e}")
+            print(f"[Ошибка] Password verification failed: {e}")
             attempts -= 1
 
     return False
@@ -125,11 +125,11 @@ def list_mods():
             active_mods.append(mod_name)
 
     if active_mods:
-        print("\nАктивные моды:")
+        print("\nActive mods:")
         for mod in active_mods:
             print(f"- {mod}")
     else:
-        print("\nНет активных модов.")
+        print("\nNo active mods.")
 
 
 def manage_settings():
@@ -149,12 +149,12 @@ def manage_settings():
         }
 
     # Отображение текущих настроек
-    print("\nТекущие настройки:")
+    print("\nCurrent settings:")
     for key, value in settings.items():
         print(f"{key}: {value}")
 
     # Редактирование
-    print("\nРедактирование (оставьте пустым чтобы пропустить):")
+    print("\nEditor (Press enter to skip):")
     for key in settings:
         new_value = input(f"{key} [{settings[key]}]: ")
         if new_value:
@@ -172,4 +172,4 @@ def manage_settings():
     # Сохранение
     with open(settings_file, "w") as f:
         json.dump(settings, f, indent=4)
-    print("\n[Успех] Настройки сохранены.")
+    print("\n[Success] Settings saved.")

@@ -19,8 +19,8 @@ def show_logo():
 ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚════╝  ╚═╝  ╚═╝╚═════╝  
 """
     print(logo)
-    print("Добро пожаловать в HatJab v2.1!")
-    print("Введите 'help' для списка команд\n")
+    print("Welcome to HatJab v1.0.5!")
+    print("Type 'help' to view commands\n")
 
 def initialize_environment():
     """Инициализация окружения"""
@@ -30,20 +30,20 @@ def initialize_environment():
 
     if os.path.exists("System/catal.modhj"):
         if not crypto.decrypt_to_file("System/catal.modhj", "System/catal.py"):
-            print("[Ошибка] Не удалось расшифровать catal.modhj")
+            print("[Error] Unable to decrypt catal.modhj")
 
 def load_commands():
     """Загрузка команд"""
     commands_file = "Scripts/commands.txt"
     default_commands = {
-        "help": "Показать список команд",
-        "mods": "Список активных модов",
-        "clear": "Очистить консоль",
-        "settings": "Графический редактор системы",
-        "exit": "Выход из программы",
-        "backup": "Создать резервную копию",
-        "catt": "Показать моды в catalyst",
-        "version": "Показать версию системы"
+        "help": "Show command list",
+        "mods": "Show mods list",
+        "clear": "Clear console",
+        "settings": "System settings",
+        "exit": "Exit",
+        "backup": "Create backup",
+        "catt": "Show mods in catalyst",
+        "version": "System version"
     }
 
     if not os.path.exists(commands_file):
@@ -53,7 +53,7 @@ def load_commands():
                     f.write(f"{cmd}\t| {desc}\n")
             return list(default_commands.items())
         except Exception as e:
-            print(f"[Ошибка] Не удалось создать commands.txt: {e}")
+            print(f"[Error] Failed to create commands.txt: {e}")
             return list(default_commands.items())
 
     encodings = ['utf-8', 'cp1251', 'utf-16-le']
@@ -72,17 +72,17 @@ def load_commands():
         except UnicodeDecodeError:
             continue
         except Exception as e:
-            print(f"[Ошибка] Чтение commands.txt: {e}")
+            print(f"[Error] Reading commands.txt: {e}")
             continue
 
-    print("[Внимание] Создаю новый файл команд")
+    print("[NOTICE] Creating new command file...")
     try:
         with open(commands_file, "w", encoding="utf-8") as f:
             for cmd, desc in default_commands.items():
                 f.write(f"{cmd}\t| {desc}\n")
         return list(default_commands.items())
     except Exception as e:
-        print(f"[Критично] Не удалось создать commands.txt: {e}")
+        print(f"[CRITICAL] Failed to create commands.txt: {e}")
         return [("help", "Показать справку"), ("exit", "Выход")]
 
 def run_ai_editor():
@@ -93,9 +93,9 @@ def run_ai_editor():
         from Scripts.settings import start_editor
         start_editor()
     except ImportError as e:
-        print(f"[Ошибка] Не удалось импортировать редактор: {e}")
+        print(f"[Error] Failed to import editor: {e}")
     except Exception as e:
-        print(f"[Ошибка] Ошибка в работе редактора: {e}")
+        print(f"[Error] Editor malfunction: {e}")
 
 def main():
     """Основная функция программы"""
@@ -108,7 +108,7 @@ def main():
     try:
         from System import catal
     except ImportError as e:
-        print(f"[Ошибка] Не удалось загрузить модуль catal: {e}")
+        print(f"[Error] Failed to load module catal: {e}")
         catal = None
 
     commands = load_commands()
@@ -120,7 +120,7 @@ def main():
                 continue
 
             if cmd == "help":
-                print("\nДоступные команды:")
+                print("\nCommands:")
                 max_len = max(len(c[0]) for c in commands)
                 for c, d in commands:
                     print(f"  {c.ljust(max_len)} - {d}")
@@ -130,7 +130,7 @@ def main():
 
             elif cmd == "catt" and catal:
                 files = catal.get_mod_list()
-                print("\nФайлы в catalyst:" if files else "\nПапка catalyst пуста")
+                print("\nFile in catalyst:" if files else "\nFolder catalyst is empty")
                 for f in sorted(files):
                     print(f"- {f}")
 
@@ -145,19 +145,19 @@ def main():
 
                 except Exception as e:
 
-                    print(f"[Ошибка] Не удалось запустить редактор: {e}")
+                    print(f"[Error] Failed to start editor: {e}")
 
             elif cmd == "exit":
                 if catal and catal.process_mods():
-                    print("\n[Система] Новые моды были установлены")
+                    print("\n[System] New mods installed")
 
-                if input("\nСохранить сессию перед выходом? (y/n): ").lower() == 'y':
+                if input("\nSave session before exit? (y/n): ").lower() == 'y':
                     crypto.save_session()
-                    print("Сессия сохранена")
+                    print("Session saved")
 
                 if os.path.exists("System/catal.py"):
                     crypto.encrypt_file("System/catal.py", "System/catal.modhj")
-                    print("Файл catal зашифрован")
+                    print("File catal encrypted")
                 break
 
             elif cmd == "clear":
@@ -168,21 +168,21 @@ def main():
 
             elif cmd == "version":
                 print("\nHatJab v1.0.5")
-                print("Система управления модами с шифрованием")
+                print("Mod & Encryption management System")
 
             else:
-                print(f"\nНеизвестная команда: {cmd}")
-                print("Введите 'help' для списка команд")
+                print(f"\nUnknown command: {cmd}")
+                print("Type 'help' to view commands")
 
         except KeyboardInterrupt:
             print("\nПрерывание (Ctrl+C)")
-            if input("Завершить работу? (y/n): ").lower() == 'y':
+            if input("Terminate program? (y/n): ").lower() == 'y':
                 if os.path.exists("System/catal.py"):
                     crypto.encrypt_file("System/catal.py", "System/catal.modhj")
                 break
 
         except Exception as e:
-            print(f"\n[Ошибка] {e}")
+            print(f"\n[Error] {e}")
 
 if __name__ == "__main__":
     main()
