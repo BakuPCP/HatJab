@@ -9,6 +9,15 @@ def handle_command(cmd, commands, catal=None):
     if not cmd:
         return True
 
+    if cmd == "get gui":
+        try:
+            from gui_launcher import launch_gui
+            launch_gui()
+            return False  # Закрыть консоль после запуска GUI
+        except Exception as e:
+            print(f"[Error] Failed to launch GUI: {e}")
+            return True
+
     if cmd == "help":
         print("\nCommands:")
         max_len = max(len(c[0]) for c in commands)

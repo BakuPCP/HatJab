@@ -6,6 +6,7 @@ def load_commands():
     default_commands = {
         "help": "Show command list",
         "mods": "Show mods list",
+        "get gui": "Show in GUI",
         "clear": "Clear console",
         "settings": "System settings",
         "settings text color [color]": "Change text color",

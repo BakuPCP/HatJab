@@ -6,3 +6,4 @@ exit	| Exit
 backup	| Create backup
 catt	| Show mods in catalyst
 version	| System version
+settings text color [color] | Change text color

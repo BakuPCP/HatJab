@@ -112,24 +112,20 @@ def activate_cooldown():
     os.chmod(LOCK_FILE, 0o600)
 
 
-def list_mods():
-    """Список активных модов"""
-    mods_dir = "mods"
-    if not os.path.exists(mods_dir):
-        os.makedirs(mods_dir, exist_ok=True)
+def list_mods(return_list=False):
+    """Список модов (с поддержкой GUI)"""
+    mods = []
+    if os.path.exists("mods"):
+        for f in os.listdir("mods"):
+            if f.endswith('_d.lhj'):
+                mods.append(f.replace('_d.lhj', ''))
 
-    active_mods = []
-    for file in os.listdir(mods_dir):
-        if file.endswith("_d.lhj"):
-            mod_name = file.replace("_d.lhj", "")
-            active_mods.append(mod_name)
+    if return_list:
+        return mods
 
-    if active_mods:
-        print("\nActive mods:")
-        for mod in active_mods:
-            print(f"- {mod}")
-    else:
-        print("\nNo active mods.")
+    print("\nInstalled mods:" if mods else "\nNo mods installed")
+    for mod in mods:
+        print(f"- {mod}")
 
 
 def manage_settings():
