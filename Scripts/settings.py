@@ -91,12 +91,12 @@ class SettingsEditor:
         #).grid(row=1, column=1, sticky=tk.W, pady=2)
 
         # Автосохранение
-        self.autosave_var = tk.BooleanVar(value=self.settings.get("autosave", True))
-        ttk.Checkbutton(
-            frame,
-            text="Autosave",
-            variable=self.autosave_var
-        ).grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=2)
+        #self.autosave_var = tk.BooleanVar(value=self.settings.get("autosave", True))
+        #ttk.Checkbutton(
+         #   frame,
+          #  text="Autosave(not working)",
+           # variable=self.autosave_var
+        #).grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=2)
 
         # Размер шрифта
         ttk.Label(frame, text="Font size:").grid(row=3, column=0, sticky=tk.W, pady=2)
@@ -135,7 +135,7 @@ class SettingsEditor:
         else:
             main_bg = "#424242"  # Темно-серый (основной фон)
             frame_bg = "#616161"  # Чуть светлее для рамок
-            fg_color = "#FFFFFF"  # Белый текст
+            fg_color = "#000000"  # Белый текст
             entry_bg = "#303030"  # Темный для полей ввода
 
         # Настраиваем основной фон окна
