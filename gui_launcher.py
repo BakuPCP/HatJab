@@ -5,6 +5,7 @@ import shutil
 from datetime import datetime
 from System import catal, hjcheck, crypto
 from core.commands import load_commands
+from core.settings_manager import settings_manager
 
 
 class HatJabGUI:
@@ -143,16 +144,14 @@ Type 'help' for available commands
         self.print_output("Usage: 'settings text color <color>'\n")
 
     def change_text_color(self, cmd):
-        """Изменить цвет текста"""
         color = cmd.split()[-1].lower()
-        colors = {
-            'green': '#00FF00',
-            'lightblue': '#ADD8E6',
-            'purple': '#800080',
-            'default': '#FFFFFF'
-        }
-        if color in colors:
-            self.text_color = colors[color]
+        if settings_manager.save_color(color):
+            self.text_color = {
+                'green': '#00FF00',
+                'lightblue': '#ADD8E6',
+                'purple': '#800080',
+                'default': '#FFFFFF'
+            }[color]
             self.output_text.configure(fg=self.text_color)
             self.print_output(f"Text color changed to {color}\n")
         else:

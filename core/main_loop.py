@@ -2,7 +2,7 @@ import os
 import sys
 from System import crypto
 from .commands import load_commands
-
+from core.settings_manager import settings_manager
 
 def handle_command(cmd, commands, catal=None):
     """Обработка команд"""
@@ -28,25 +28,29 @@ def handle_command(cmd, commands, catal=None):
         from System import hjcheck
         hjcheck.list_mods()
 
-    elif cmd.startswith("settings text color"):
-        # Обработка изменения цвета текста
-        color = cmd.split()[-1].lower()
-        colors = {
-            'green': '\033[92m',
-            'lightblue': '\033[94m',
-            'purple': '\033[95m',
-            'default': '\033[0m'
-        }
 
-        if color in colors:
-            # Сохраняем настройки цвета
-            try:
-                with open("Scripts/color.cfg", "w") as f:
-                    f.write(color)
-                print(f"{colors[color]}Text color changed to {color}{colors['default']}")
-            except Exception as e:
-                print(f"[Error] Failed to save color settings: {e}")
+    elif cmd.startswith("settings text color"):
+
+        color = cmd.split()[-1].lower()
+
+        if settings_manager.save_color(color):
+
+            colors = {
+
+                'green': '\033[92m',
+
+                'lightblue': '\033[94m',
+
+                'purple': '\033[95m',
+
+                'default': '\033[0m'
+
+            }
+
+            print(f"{colors[color]}Text color changed to {color}{colors['default']}")
+
         else:
+
             print("Available colors: green, lightblue, purple, default")
 
     elif cmd == "catt" and catal:
@@ -56,26 +60,11 @@ def handle_command(cmd, commands, catal=None):
             print(f"- {f}")
 
     elif cmd == "settings":
-        print("\nChoose settings editor:")
-        print("1. Console")
-        print("2. GUI")
-        choice = input("Select (1-2): ").strip()
-
-        if choice == "1":
-            try:
-                from Scripts.console_settings import ConsoleSettingsEditor
-                editor = ConsoleSettingsEditor()
-                editor.run()
-            except Exception as e:
-                print(f"[Error] Failed to start console: {e}")
-        elif choice == "2":
-            try:
-                from Scripts.settings import start_editor
-                start_editor()
-            except Exception as e:
-                print(f"[Error] Failed to start GUI: {e}")
-        else:
-            print("Invalid choice, returning to main menu")
+        try:
+            from Scripts.settings import start_editor
+            start_editor()
+        except Exception as e:
+            print(f"[Error] Failed to start GUI settings editor: {e}")
 
 
     elif cmd == "exit":
