@@ -3,6 +3,7 @@ mods	| Show mods list
 clear	| Clear console
 settings	| System settings
 exit	| Exit
+reboot	| Restart the program
 backup	| Create backup
 catt	| Show mods in catalyst
 version	| System version

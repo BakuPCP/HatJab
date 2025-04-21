@@ -4,6 +4,11 @@ from System import crypto
 from .commands import load_commands
 from core.settings_manager import settings_manager
 
+def restart_program():
+    """Перезапускает программу"""
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
 def handle_command(cmd, commands, catal=None):
     """Обработка команд"""
     if not cmd:
@@ -77,6 +82,12 @@ def handle_command(cmd, commands, catal=None):
         except Exception as e:
             print(f"[Error] Failed to start GUI settings editor: {e}")
 
+    elif cmd == "reboot":
+        print("\n[System] Restarting program...")
+        if catal and catal.process_mods():
+            print("[System] New mods installed before restart")
+        restart_program()
+        return False
 
     elif cmd == "exit":
 
