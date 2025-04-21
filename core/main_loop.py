@@ -45,6 +45,77 @@ def handle_command(cmd, commands, catal=None):
         else:
             print("\nInvalid mode. Use 'gui' or 'console'")
 
+    elif cmd.startswith("settings autosave"):
+        args = cmd.split()[2:]
+
+        if not args or args[0] == "help":
+            print("\nUsage:")
+            print("  settings autosave on [interval]  - Enable autosave (optional interval in minutes)")
+            print("  settings autosave off           - Disable autosave")
+            return True
+
+        new_settings = settings_manager.settings.copy()
+
+        if args[0] == "on":
+            new_settings["autosave"] = True
+            if len(args) > 1 and args[1].isdigit():
+                new_settings["autosave_interval"] = int(args[1])
+            print("\nAutosave enabled" +
+                  (
+                      f" with {new_settings['autosave_interval']} min interval" if 'autosave_interval' in new_settings else ""))
+
+        elif args[0] == "off":
+            new_settings["autosave"] = False
+            print("\nAutosave disabled")
+
+        else:
+            print("\nInvalid argument. Use 'on' or 'off'")
+            return True
+
+        if settings_manager.save_settings(new_settings):
+            print("Settings saved")
+        else:
+            print("Failed to save settings")
+
+    elif cmd.startswith("settings env"):
+        args = cmd.split()[2:]
+
+        if not args or args[0] == "help":
+            print("\nUsage:")
+            print("  settings env list                   - Show all variables")
+            print("  settings env get [VAR]              - Get value")
+            print("  settings env set [VAR] [VALUE]      - Set value")
+            print("  settings env unset [VAR]            - Remove variable")
+            return True
+
+        action = args[0]
+        result = None
+
+        if action == "list":
+            env_vars = settings_manager.handle_env_vars("list")
+            print("\nEnvironment variables:")
+            for k, v in env_vars.items():
+                print(f"  {k}={v}")
+
+        elif action == "get" and len(args) >= 2:
+            value = settings_manager.handle_env_vars("get", args[1])
+            print(f"\n{args[1]}={value}")
+
+        elif action == "set" and len(args) >= 3:
+            if settings_manager.handle_env_vars("set", args[1], " ".join(args[2:])):
+                print(f"\nSet: {args[1]}={' '.join(args[2:])}")
+            else:
+                print("\nSetting error")
+
+        elif action == "unset" and len(args) >= 2:
+            if settings_manager.handle_env_vars("unset", args[1]):
+                print(f"\nRemoved: {args[1]}")
+            else:
+                print("\nRemoval error")
+
+        else:
+            print("\nInvalid arguments. Use 'settings env help'")
+
     elif cmd.startswith("settings text color"):
 
         color = cmd.split()[-1].lower()

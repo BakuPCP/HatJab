@@ -1,4 +1,3 @@
-# core/settings_manager.py
 import json
 import os
 from pathlib import Path
@@ -55,8 +54,10 @@ class SettingsManager:
         default_settings = {
             "theme": "dark",
             "autosave": True,
+            "autosave_interval": 5,
             "font_size": 12,
-            "first_start": "console"
+            "first_start": "console",
+            "env_vars": {}
         }
 
         if not self.settings_file.exists():
@@ -70,6 +71,32 @@ class SettingsManager:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load settings: {str(e)}")
             return default_settings
+
+    def handle_env_vars(self, action: str, key: str = None, value: str = None) -> Any:
+        """Обрабатывает операции с переменными окружения"""
+        env_vars = self._settings.get("env_vars", {})
+
+        if action == "list":
+            return env_vars
+
+        elif action == "get":
+            return env_vars.get(key, "")
+
+        elif action == "set":
+            if not key:
+                return False
+            env_vars[key] = value
+            self._settings["env_vars"] = env_vars
+            return self.save_settings(self._settings)
+
+        elif action == "unset":
+            if key in env_vars:
+                del env_vars[key]
+                self._settings["env_vars"] = env_vars
+                return self.save_settings(self._settings)
+            return False
+
+        return False
 
     def _load_commands(self) -> list:
         """Загружает команды из файла"""
