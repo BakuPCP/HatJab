@@ -45,12 +45,18 @@ class SettingsManager:
         """Возвращает текущий цвет текста"""
         return self._color
 
+    @property
+    def first_start_mode(self) -> str:
+        """Возвращает режим первого запуска"""
+        return self._settings.get("first_start", "console")
+
     def _load_settings(self) -> Dict[str, Any]:
         """Загружает настройки из файла"""
         default_settings = {
             "theme": "dark",
             "autosave": True,
-            "font_size": 12
+            "font_size": 12,
+            "first_start": "console"
         }
 
         if not self.settings_file.exists():

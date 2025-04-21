@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 import json
 import os
 from pathlib import Path
+from core.settings_manager import settings_manager
 
 
 class SettingsEditor:
@@ -166,49 +167,44 @@ class SettingsEditor:
             )
 
     def _load_settings(self):
-        """Загрузка настроек из файла"""
-        if self.settings_file.exists():
-            try:
-                with open(self.settings_file, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to install settings: {str(e)}")
-                return {"theme": "dark","autosave": True, "font_size": 12}
-        return {"theme": "dark","autosave": True, "font_size": 12}
+
+        return settings_manager.settings
+
+        #"""Загрузка настроек из файла"""
+       # if self.settings_file.exists():
+        #    try:
+         #       with open(self.settings_file, "r", encoding="utf-8") as f:
+          #          return json.load(f)
+           # except Exception as e:
+            #    messagebox.showerror("Error", f"Failed to install settings: {str(e)}")
+             #   return {"theme": "dark","autosave": True, "font_size": 12}
+        #return {"theme": "dark","autosave": True, "font_size": 12}
 
     def _load_commands(self):
-        """Загрузка команд из файла"""
-        if self.commands_file.exists():
-            try:
-                with open(self.commands_file, "r", encoding="utf-8") as f:
-                    return [line.strip() for line in f.readlines() if line.strip()]
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to install commands: {str(e)}")
-                return []
-        return []
+        return settings_manager.commands
+       # """Загрузка команд из файла"""
+        #if self.commands_file.exists():
+        #    try:
+        #        with open(self.commands_file, "r", encoding="utf-8") as f:
+        #            return [line.strip() for line in f.readlines() if line.strip()]
+        #    except Exception as e:
+        #        messagebox.showerror("Error", f"Failed to install commands: {str(e)}")
+        #        return []
+        #return []
 
     def _save_all(self):
-        """Сохранение всех изменений"""
         try:
-            # Сохраняем настройки
             new_settings = {
                 "theme": self.theme_var.get(),
-                #"language": self.lang_var.get(),
                 "autosave": self.autosave_var.get(),
                 "font_size": self.font_var.get()
             }
 
-            with open(self.settings_file, "w", encoding="utf-8") as f:
-                json.dump(new_settings, f, indent=4, ensure_ascii=False)
-
-            # Сохраняем команды
-            commands = self.commands_text.get("1.0", tk.END).strip().split("\n")
-            with open(self.commands_file, "w", encoding="utf-8") as f:
-                f.write("\n".join([cmd.strip() for cmd in commands if cmd.strip()]))
-
-            messagebox.showinfo("Save", "Settings saved successfully!")
-            self.master.destroy()
-
+            if settings_manager.save_settings(new_settings):
+                commands = self.commands_text.get("1.0", tk.END).strip().split("\n")
+                if settings_manager.save_commands(commands):
+                    messagebox.showinfo("Save", "Settings saved successfully!")
+                    self.master.destroy()
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save settings: {str(e)}")
 

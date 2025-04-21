@@ -28,6 +28,17 @@ def handle_command(cmd, commands, catal=None):
         from System import hjcheck
         hjcheck.list_mods()
 
+    elif cmd.startswith("settings --first-start"):
+        mode = cmd.split()[-1].lower()
+        if mode in ["gui", "console"]:
+            new_settings = settings_manager.settings.copy()
+            new_settings["first_start"] = mode
+            if settings_manager.save_settings(new_settings):
+                print(f"\nStartup mode set to: {mode}")
+            else:
+                print("\nFailed to save settings")
+        else:
+            print("\nInvalid mode. Use 'gui' or 'console'")
 
     elif cmd.startswith("settings text color"):
 
@@ -99,6 +110,16 @@ def handle_command(cmd, commands, catal=None):
 
 def main_loop(catal=None):
     """Основной цикл программы"""
+    # Проверяем режим первого запуска
+    if settings_manager.first_start_mode == "gui":
+        try:
+            from gui_launcher import launch_gui
+            launch_gui()
+            return
+        except Exception as e:
+            print(f"[Error] Failed to launch GUI: {e}")
+            print("Falling back to console mode")
+
     commands = load_commands()
 
     while True:

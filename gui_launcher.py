@@ -12,7 +12,7 @@ class HatJabGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("HatJab GUI v1.0")
-        self.root.geometry("800x600")
+        self.root.geometry("1000x600")
         self.root.configure(bg='#333333')
 
         # Инициализация компонентов
@@ -32,7 +32,7 @@ class HatJabGUI:
         """Настройка интерфейса"""
         # Основной фрейм
         self.output_frame = tk.Frame(self.root, bg=self.frame_color, bd=2, relief=tk.RAISED)
-        self.output_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.output_frame.pack(fill=tk.BOTH, expand=True, padx=300, pady=10)
 
         # Текстовое поле
         self.output_text = scrolledtext.ScrolledText(
@@ -48,10 +48,10 @@ class HatJabGUI:
 
         # Фрейм ввода
         self.input_frame = tk.Frame(self.root, bg=self.bg_color)
-        self.input_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        self.input_frame.pack(fill=tk.X, padx=400, pady=(0, 10))
 
         # Поле ввода
-        self.cmd_entry = ttk.Entry(self.input_frame, font=('Consolas', 10))
+        self.cmd_entry = tk.Entry(self.input_frame, font=('Consolas', 10))
         self.cmd_entry.pack(fill=tk.X, expand=True)
         self.cmd_entry.bind('<Return>', self.execute_command)
         self.cmd_entry.focus_set()
@@ -103,6 +103,17 @@ Type 'help' for available commands
                     print(f"[Error] Failed to start GUI: {e}")
             elif cmd.startswith("settings text color"):
                 self.change_text_color(cmd)
+            elif cmd.startswith("settings --first-start"):
+                mode = cmd.split()[-1].lower()
+                if mode in ["gui", "console"]:
+                    new_settings = settings_manager.settings.copy()
+                    new_settings["first_start"] = mode
+                    if settings_manager.save_settings(new_settings):
+                        print(f"\nStartup mode set to: {mode}")
+                    else:
+                        print("\nFailed to save settings")
+                else:
+                    print("\nInvalid mode. Use 'gui' or 'console'")
             elif cmd == "backup":
                 self.create_backup()
             elif cmd == "catt":
