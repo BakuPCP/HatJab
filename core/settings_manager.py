@@ -72,6 +72,34 @@ class SettingsManager:
             messagebox.showerror("Error", f"Failed to load settings: {str(e)}")
             return default_settings
 
+    def handle_aliases(self, action: str, alias: str = None, command: str = None) -> bool:
+        """Управление алиасами: add, remove, list"""
+        if 'aliases' not in self._settings:
+            self._settings['aliases'] = {}
+
+        if action == "list":
+            return self._settings['aliases']
+
+        elif action == "set":
+            if not alias or not command:
+                return False
+            self._settings['aliases'][alias] = command
+            return self.save_settings(self._settings)
+
+        elif action == "remove":
+            if alias in self._settings['aliases']:
+                del self._settings['aliases'][alias]
+                return self.save_settings(self._settings)
+
+        return False
+
+    def set_autocomplete(self, enabled: bool) -> bool:
+        self._settings["autocomplete"] = enabled
+        return self.save_settings(self._settings)
+
+    def get_autocomplete(self) -> bool:
+        return self._settings.get("autocomplete", True)
+
     def handle_env_vars(self, action: str, key: str = None, value: str = None) -> Any:
         """Обрабатывает операции с переменными окружения"""
         env_vars = self._settings.get("env_vars", {})

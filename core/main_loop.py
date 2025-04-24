@@ -3,6 +3,7 @@ import sys
 from System import crypto
 from .commands import load_commands
 from core.settings_manager import settings_manager
+from .autocomplete import init_autocomplete, disable_autocomplete
 
 def restart_program():
     """Перезапускает программу"""
@@ -45,6 +46,44 @@ def handle_command(cmd, commands, catal=None):
         else:
             print("\nInvalid mode. Use 'gui' or 'console'")
 
+    elif cmd.startswith("settings alias"):
+        args = cmd.split()[2:]
+
+        if not args or args[0] == "help":
+            print("\nUsage:")
+            print("  settings alias list          - Show all aliases")
+            print("  settings alias [name=cmd]   - Create alias")
+            print("  settings alias [name]=      - Remove alias")
+            return True
+
+        # Обработка list
+        if args[0] == "list":
+            aliases = settings_manager.handle_aliases("list")
+            print("\nAliases:" if aliases else "\nNo aliases defined")
+            for name, cmd in aliases.items():
+                print(f"  {name.ljust(10)} = {cmd}")
+            return True
+
+        # Обработка добавления/удаления
+        if "=" in args[0]:
+            alias, _, command = args[0].partition("=")
+            if not alias:
+                print("\nError: Alias name cannot be empty")
+                return True
+
+            if command:  # Добавление
+                if settings_manager.handle_aliases("set", alias, command):
+                    print(f"\nAlias set: {alias} = {command}")
+                else:
+                    print("\nFailed to set alias")
+            else:  # Удаление
+                if settings_manager.handle_aliases("remove", alias):
+                    print(f"\nAlias removed: {alias}")
+                else:
+                    print("\nAlias not found")
+        else:
+            print("\nInvalid syntax. Use 'name=command'")
+
     elif cmd.startswith("settings autosave"):
         args = cmd.split()[2:]
 
@@ -76,6 +115,23 @@ def handle_command(cmd, commands, catal=None):
             print("Settings saved")
         else:
             print("Failed to save settings")
+
+    elif cmd.startswith("settings autocomplete"):
+        args = cmd.split()[2:]
+        if not args or args[0] not in ["on", "off"]:
+            print("\nUsage: settings autocomplete [on/off]")
+            return True
+
+        enabled = args[0] == "on"
+        if settings_manager.set_autocomplete(enabled):
+            if enabled:
+                init_autocomplete([cmd[0] for cmd in commands])
+                print("\nAutocomplete: ON (press TAB)")
+            else:
+                disable_autocomplete()
+                print("\nAutocomplete: OFF")
+        else:
+            print("\nFailed to save settings")
 
     elif cmd.startswith("settings env"):
         args = cmd.split()[2:]
@@ -191,8 +247,9 @@ def handle_command(cmd, commands, catal=None):
 
 
 def main_loop(catal=None):
-    """Основной цикл программы"""
+    """Основной цикл программы с поддержкой автодополнения"""
     # Проверяем режим первого запуска
+    global init_autocomplete
     if settings_manager.first_start_mode == "gui":
         try:
             from gui_launcher import launch_gui
@@ -204,10 +261,44 @@ def main_loop(catal=None):
 
     commands = load_commands()
 
+    # Инициализация автодополнения (НОВЫЙ БЛОК)
+    try:
+        if settings_manager.get_autocomplete():
+            from .autocomplete import init_autocomplete
+            command_names = [cmd[0] for cmd in commands]
+            init_autocomplete(command_names)
+    except Exception as e:
+        print(f"[Warning] Autocomplete init failed: {e}")
+
     while True:
         try:
-            cmd = input("> ").strip().lower()
-            if not handle_command(cmd, commands, catal):
+            # Получение ввода с поддержкой алиасов
+            user_input = input("> ").strip()
+            aliases = settings_manager.handle_aliases("list")
+            cmd = aliases.get(user_input.split()[0], user_input)
+
+            # Обработка команды автодополнения (НОВЫЙ ОБРАБОТЧИК)
+            if cmd.startswith("settings autocomplete"):
+                args = cmd.split()[2:]
+                if not args or args[0] not in ["on", "off"]:
+                    print("\nUsage: settings autocomplete [on/off]")
+                    continue
+
+                enabled = args[0] == "on"
+                if settings_manager.set_autocomplete(enabled):
+                    if enabled:
+                        init_autocomplete([cmd[0] for cmd in commands])
+                        print("\nAutocomplete: ON (press TAB)")
+                    else:
+                        from .autocomplete import disable_autocomplete
+                        disable_autocomplete()
+                        print("\nAutocomplete: OFF")
+                else:
+                    print("\nFailed to save settings")
+                continue
+
+            # Стандартная обработка команд
+            if not handle_command(cmd.lower(), commands, catal):
                 break
 
         except KeyboardInterrupt:
@@ -216,6 +307,5 @@ def main_loop(catal=None):
                 if os.path.exists("System/catal.py"):
                     crypto.encrypt_file("System/catal.py", "System/catal.modhj")
                 break
-
         except Exception as e:
             print(f"\n[Error] {e}")

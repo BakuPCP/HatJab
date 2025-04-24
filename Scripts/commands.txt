@@ -12,3 +12,5 @@ settings --first-start [gui/console] | Set default startup mode
 settings show | Display current settings
 settings env [action] | Manage environment variables (list/get/set/unset)
 settings autosave [on/off] [interval] | Enable/disable autosave with optional interval (in minutes)
+settings alias [name=command/list] | Create command aliases (shortcuts)
+settings autocomplete [on/off] | on/off autocomplete commands (TAB)
