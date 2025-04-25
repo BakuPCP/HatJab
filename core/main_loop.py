@@ -4,13 +4,15 @@ from System import crypto
 from .commands import load_commands
 from core.settings_manager import settings_manager
 from .autocomplete import init_autocomplete, disable_autocomplete
+from .cryptofile import crypto_file
+from core.mods_loop import mods_manager
 
 def restart_program():
     """Перезапускает программу"""
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
-def handle_command(cmd, commands, catal=None):
+def handle_command(cmd, commands):
     """Обработка команд"""
     if not cmd:
         return True
@@ -31,8 +33,64 @@ def handle_command(cmd, commands, catal=None):
             print(f"  {c.ljust(max_len)} - {d}")
 
     elif cmd == "mods":
-        from System import hjcheck
-        hjcheck.list_mods()
+        mods_manager.refresh_mods_list()
+
+        colors = {
+            'loaded': '\033[92m',
+            'available': '\033[94m',
+            'reset': '\033[0m'
+        }
+
+        print("\n{}Доступные моды:{}".format(colors['loaded'], colors['reset']))
+        print("{:<20} {:<40} {}".format("Имя", "Расположение", "Статус"))
+        print("-" * 80)
+
+        mods_list = mods_manager.get_available_mods()
+
+        if not mods_list:
+            print("Нет доступных модов в папке 'mods' и подпапках")
+        else:
+            for mod in mods_list:
+                status_color = colors['loaded'] if mod['loaded'] else colors['available']
+                status_text = "Загружен" if mod['loaded'] else "Доступен"
+
+                print("{}{:<20}{} {:<40} {}{}{}".format(
+                    colors['available'],
+                    mod['name'],
+                    colors['reset'],
+                    mod['path'],
+                    status_color,
+                    status_text,
+                    colors['reset']
+                ))
+
+    elif cmd.startswith("testmod"):
+        # Проверяем наличие аргументов
+        args = cmd.split()[1:] if len(cmd.split()) > 1 else None
+
+        # Указываем полный путь к моду через точку (если в подпапке)
+        mod_path = "test.testmode"  # ПРИМЕР К БУДУЩИМ МОДАМ
+        mods_manager.execute_mod_command(mod_path + (f" {' '.join(args)}" if args else ""))
+
+    elif cmd.startswith("crypt "):
+        file_path = cmd[6:].strip()
+        if not file_path:
+            print("\nError: Please specify file path")
+        else:
+            if crypto_file.encrypt_file(file_path):
+                print(f"\nFile encrypted: {file_path}.enc created")
+            else:
+                print("\nEncryption failed")
+
+    elif cmd.startswith("decrypt "):
+        file_path = cmd[8:].strip()
+        if not file_path:
+            print("\nError: Please specify file path")
+        else:
+            if crypto_file.decrypt_file(file_path):
+                print(f"\nFile decrypted: {file_path[:-4]} created")
+            else:
+                print("\nDecryption failed")
 
     elif cmd.startswith("settings --first-start"):
         mode = cmd.split()[-1].lower()
@@ -51,14 +109,14 @@ def handle_command(cmd, commands, catal=None):
 
         if not args or args[0] == "help":
             print("\nUsage:")
-            print("  settings alias list          - Show all aliases")
+            print("  settings alias list.txt          - Show all aliases")
             print("  settings alias [name=cmd]   - Create alias")
             print("  settings alias [name]=      - Remove alias")
             return True
 
-        # Обработка list
-        if args[0] == "list":
-            aliases = settings_manager.handle_aliases("list")
+        # Обработка list.txt
+        if args[0] == "list.txt":
+            aliases = settings_manager.handle_aliases("list.txt")
             print("\nAliases:" if aliases else "\nNo aliases defined")
             for name, cmd in aliases.items():
                 print(f"  {name.ljust(10)} = {cmd}")
@@ -138,7 +196,7 @@ def handle_command(cmd, commands, catal=None):
 
         if not args or args[0] == "help":
             print("\nUsage:")
-            print("  settings env list                   - Show all variables")
+            print("  settings env list.txt                   - Show all variables")
             print("  settings env get [VAR]              - Get value")
             print("  settings env set [VAR] [VALUE]      - Set value")
             print("  settings env unset [VAR]            - Remove variable")
@@ -147,8 +205,8 @@ def handle_command(cmd, commands, catal=None):
         action = args[0]
         result = None
 
-        if action == "list":
-            env_vars = settings_manager.handle_env_vars("list")
+        if action == "list.txt":
+            env_vars = settings_manager.handle_env_vars("list.txt")
             print("\nEnvironment variables:")
             for k, v in env_vars.items():
                 print(f"  {k}={v}")
@@ -196,12 +254,6 @@ def handle_command(cmd, commands, catal=None):
 
             print("Available colors: green, lightblue, purple, default")
 
-    elif cmd == "catt" and catal:
-        files = catal.get_mod_list()
-        print("\nFile in catalyst:" if files else "\nFolder catalyst is empty")
-        for f in sorted(files):
-            print(f"- {f}")
-
     elif cmd == "settings":
         try:
             from Scripts.settings import start_editor
@@ -211,23 +263,16 @@ def handle_command(cmd, commands, catal=None):
 
     elif cmd == "reboot":
         print("\n[System] Restarting program...")
-        if catal and catal.process_mods():
-            print("[System] New mods installed before restart")
         restart_program()
         return False
 
     elif cmd == "exit":
-
-        if catal and catal.process_mods():
-            print("\n[System] New mods installed")
-
         if input("\nSave session before exit? (y/n): ").lower() == 'y':
             crypto.save_session()
-
             print("Session saved")
             return False
-
-
+        else:
+            return False
 
     elif cmd == "clear":
         os.system("cls" if os.name == "nt" else "clear")
@@ -246,7 +291,7 @@ def handle_command(cmd, commands, catal=None):
     return True
 
 
-def main_loop(catal=None):
+def main_loop():
     """Основной цикл программы с поддержкой автодополнения"""
     # Проверяем режим первого запуска
     global init_autocomplete
@@ -274,7 +319,7 @@ def main_loop(catal=None):
         try:
             # Получение ввода с поддержкой алиасов
             user_input = input("> ").strip()
-            aliases = settings_manager.handle_aliases("list")
+            aliases = settings_manager.handle_aliases("list.txt")
             cmd = aliases.get(user_input.split()[0], user_input)
 
             # Обработка команды автодополнения (НОВЫЙ ОБРАБОТЧИК)
@@ -298,14 +343,13 @@ def main_loop(catal=None):
                 continue
 
             # Стандартная обработка команд
-            if not handle_command(cmd.lower(), commands, catal):
+            if not handle_command(cmd.lower(), commands):
                 break
 
         except KeyboardInterrupt:
             print("\nПрерывание (Ctrl+C)")
             if input("Terminate program? (y/n): ").lower() == 'y':
-                if os.path.exists("System/catal.py"):
-                    crypto.encrypt_file("System/catal.py", "System/catal.modhj")
                 break
+
         except Exception as e:
             print(f"\n[Error] {e}")

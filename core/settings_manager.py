@@ -73,11 +73,11 @@ class SettingsManager:
             return default_settings
 
     def handle_aliases(self, action: str, alias: str = None, command: str = None) -> bool:
-        """Управление алиасами: add, remove, list"""
+        """Управление алиасами: add, remove, list.txt"""
         if 'aliases' not in self._settings:
             self._settings['aliases'] = {}
 
-        if action == "list":
+        if action == "list.txt":
             return self._settings['aliases']
 
         elif action == "set":
@@ -104,7 +104,7 @@ class SettingsManager:
         """Обрабатывает операции с переменными окружения"""
         env_vars = self._settings.get("env_vars", {})
 
-        if action == "list":
+        if action == "list.txt":
             return env_vars
 
         elif action == "get":

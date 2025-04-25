@@ -112,7 +112,7 @@ class SettingsEditor:
 
     def _setup_commands_tab(self):
         """Настройка вкладки с командами"""
-        frame = ttk.LabelFrame(self.commands_frame, text="Commands list", padding="10")
+        frame = ttk.LabelFrame(self.commands_frame, text="Commands list.txt", padding="10")
         frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Текстовое поле для команд

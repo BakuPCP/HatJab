@@ -1,18 +1,20 @@
 import os
+from .cryptofile import crypto_file
 
 def load_commands():
     """Загрузка команд"""
     commands_file = "Scripts/commands.txt"
     default_commands = {
-        "help": "Show command list",
-        "mods": "Show mods list",
+        "help": "Show command list.txt",
+        "mods": "Show mods list.txt",
         "get gui": "Show in GUI",
         "clear": "Clear console",
+        "crypt": "Encrypt file (usage: crypt path/to/file)",
+        "decrypt": "Decrypt file (usage: decrypt path/to/file.enc)",
         "settings": "System settings",
         "settings text color [color]": "Change text color",
         "exit": "Exit",
         "backup": "Create backup",
-        "catt": "Show mods in catalyst",
         "version": "System version"
     }
 

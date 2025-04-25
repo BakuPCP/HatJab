@@ -3,7 +3,7 @@ from tkinter import ttk, scrolledtext
 import os
 import shutil
 from datetime import datetime
-from System import catal, hjcheck, crypto
+from System import hjcheck, crypto
 from core.commands import load_commands
 from core.settings_manager import settings_manager
 
@@ -108,7 +108,7 @@ Type 'help' for available commands
         self.print_output(f"> {cmd}\n")
 
         # Обработка алиасов (как в main_loop.py)
-        aliases = settings_manager.handle_aliases("list")
+        aliases = settings_manager.handle_aliases("list.txt")
         cmd_lower = cmd.lower()
         if cmd_lower.split()[0] in aliases:
             alias_cmd = aliases[cmd_lower.split()[0]]
@@ -143,11 +143,11 @@ Type 'help' for available commands
                 args = cmd.split()[2:]
                 if not args or args[0] == "help":
                     self.print_output("\nUsage:\n")
-                    self.print_output("  settings alias list          - Show all aliases\n")
+                    self.print_output("  settings alias list.txt          - Show all aliases\n")
                     self.print_output("  settings alias [name=cmd]   - Create alias\n")
                     self.print_output("  settings alias [name]=      - Remove alias\n")
-                elif args[0] == "list":
-                    aliases = settings_manager.handle_aliases("list")
+                elif args[0] == "list.txt":
+                    aliases = settings_manager.handle_aliases("list.txt")
                     self.print_output("\nAliases:\n" if aliases else "\nNo aliases defined\n")
                     for name, cmd in aliases.items():
                         self.print_output(f"  {name.ljust(10)} = {cmd}\n")
@@ -192,14 +192,14 @@ Type 'help' for available commands
                 args = cmd.split()[2:]
                 if not args or args[0] == "help":
                     self.print_output("\nUsage:\n")
-                    self.print_output("  settings env list                   - Show all variables\n")
+                    self.print_output("  settings env list.txt                   - Show all variables\n")
                     self.print_output("  settings env get [VAR]              - Get value\n")
                     self.print_output("  settings env set [VAR] [VALUE]      - Set value\n")
                     self.print_output("  settings env unset [VAR]            - Remove variable\n")
                 else:
                     action = args[0]
-                    if action == "list":
-                        env_vars = settings_manager.handle_env_vars("list")
+                    if action == "list.txt":
+                        env_vars = settings_manager.handle_env_vars("list.txt")
                         self.print_output("\nEnvironment variables:\n")
                         for k, v in env_vars.items():
                             self.print_output(f"  {k}={v}\n")

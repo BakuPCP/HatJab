@@ -1,11 +1,12 @@
 help	| Show command list
 mods	| Show mods list
 clear	| Clear console
+crypt path/to/file | Encrypting file
+decrypt path/to/file | Decrypting file
 settings	| System settings
 exit	| Exit
 reboot	| Restart the program
 backup	| Create backup
-catt	| Show mods in catalyst
 version	| System version
 settings text color [color] | Change text color
 settings --first-start [gui/console] | Set default startup mode

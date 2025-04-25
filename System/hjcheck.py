@@ -9,6 +9,25 @@ COOLDOWN_TIME = 300  # 5 минут в секундах
 LOCK_FILE = "Data/auth.lock"
 
 
+def delete_mod(file_name):
+    """Удаляет установленный мод по имени файла"""
+    if not file_name.endswith('.py'):
+        print("[Error] File must have .py extension")
+        return False
+
+    mod_file = os.path.join("mods", file_name)
+
+    try:
+        if not os.path.exists(mod_file):
+            print(f"[Error] File {file_name} not found in mods")
+            return False
+
+        os.remove(mod_file)
+        return True
+    except Exception as e:
+        print(f"[Error] Failed to delete mod: {e}")
+        return False
+
 def check_password():
     """Основная функция проверки пароля"""
     password_file = "Data/ps.dhj"
@@ -117,8 +136,8 @@ def list_mods(return_list=False):
     mods = []
     if os.path.exists("mods"):
         for f in os.listdir("mods"):
-            if f.endswith('_d.lhj'):
-                mods.append(f.replace('_d.lhj', ''))
+            if f.endswith('.py'):  # Теперь ищем только .py файлы
+                mods.append(f.replace('.py', ''))
 
     if return_list:
         return mods
@@ -126,6 +145,7 @@ def list_mods(return_list=False):
     print("\nInstalled mods:" if mods else "\nNo mods installed")
     for mod in mods:
         print(f"- {mod}")
+
 
 
 def manage_settings():

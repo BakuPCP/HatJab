@@ -1,1 +1,1 @@
-__all__ = ['hjcheck', 'crypto', 'catal', 'settings']
+__all__ = ['hjcheck', 'crypto', 'settings']

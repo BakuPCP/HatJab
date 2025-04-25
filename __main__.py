@@ -11,7 +11,6 @@ sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
-
 def main():
     """Основная функция программы"""
     initialize_environment()
@@ -36,13 +35,8 @@ def main():
     if not hjcheck.check_password():
         return
 
-    try:
-        from System import catal
-    except ImportError as e:
-        print(f"[Error] Failed to load module catal: {e}")
-        catal = None
-
-    main_loop(catal)
+    # Запуск основного цикла без передачи catal
+    main_loop()
 
 if __name__ == "__main__":
     main()

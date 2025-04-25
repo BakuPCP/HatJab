@@ -126,8 +126,14 @@ def save_session():
     if not encrypt_data(json.dumps(session), "Data/session.seshj"):
         print("[Error] Failed to save session")
 
+def encrypt_file(input_file, output_file):
+    """Шифрует файл и сохраняет результат (только для критичных данных)"""
+    print("[Warning] File encryption is only for sensitive data like passwords")
+    return False
+
+
 def create_backup():
-    """Создание резервной копии"""
+    """Создание резервной копии (упрощенная версия)"""
     backup_dir = "Backups"
     os.makedirs(backup_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -140,22 +146,14 @@ def create_backup():
             "Data/rep.dhj",
             "Data/session.seshj",
             "Data/rsa_keys.keyhj",
-            "Scripts/commands.txt",
             "Scripts/settings.cfg"
         ]
 
-        # Создаем временную папку
-        temp_dir = f"temp_backup_{timestamp}"
-        os.makedirs(temp_dir, exist_ok=True)
-
-        # Копируем файлы
-        for file in important_files:
-            if os.path.exists(file):
-                shutil.copy2(file, os.path.join(temp_dir, os.path.basename(file)))
-
-        # Создаем архив
-        shutil.make_archive(os.path.join(backup_dir, backup_name), "zip", temp_dir)
-        shutil.rmtree(temp_dir)
+        # Создаем архив напрямую
+        with zipfile.ZipFile(os.path.join(backup_dir, f"{backup_name}.zip"), 'w') as zipf:
+            for file in important_files:
+                if os.path.exists(file):
+                    zipf.write(file)
 
         print(f"\n[Success] Backup {backup_name}.zip created")
         return True
